@@ -1,40 +1,65 @@
 # OpenGL Learning
 
- This repository is based on GLFW and GLAD running on MacOS. 
+This repository is based on GLFW and GLAD running on MacOS. 
 
- ### GLFW and GLAD Setup
+### GLFW and GLAD Setup
 
- Aside from the library files included in the repo, it needs extra configuration in `tasks.json` in VS Code:
+Install GLFW by the command `brew install glfw`.
 
-     ```json
-     ...
-     "args": [
-       "-std=c++17",
-       "-fdiagnostics-color=always",
-       "-Wall",
-       "-g",
-       "-I${workspaceFolder}/dependencies/include",
-       "-L${workspaceFolder}/dependencies/library",
-       "${workspaceFolder}/dependencies/library/libglfw.3.3.dylib",
-       "${workspaceFolder}/src/*.cpp",
-       "${workspaceFolder}/src/glad.c",
-       "-o",
-       "${workspaceFolder}/app",
-       "-framework",
-       "OpenGL",
-       "-framework",
-       "Cocoa",
-       "-framework",
-       "IOKit",
-       "-framework",
-       "CoreVideo",
-       "-framework",
-       "CoreFoundation",
-       "-Wno-deprecated"
-     ],
-     ...
-     ```
+Download GLAD zip file from the [official website](https://glad.dav1d.de).
 
- ### Contents
+Put library files into the workspace directory:
+```
+ __ workspace
+   |__ dependencies
+     |__ include
+       |__ glad
+         |__ glad.h
+       |__ GLFW
+         |__ glfw3.h
+         |__ glfw3native.h
+       |__ KHR
+         |__ khrplatform.h
+     |__ library
+       |__ libglfw.3.3.dylib
+   |__ src
+     |__ glad.c
+```
+* The library version needs to be consistent with the downloaded.
 
- This repository follows the [OpenGL Tutorial by The Cherno](https://www.youtube.com/watch?v=W3gAzLwfIP0&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2). To clarify, the original demo is based on GLEW and runs on Windows. Here, it's using GLAD instead and running on MacOS.
+The library files are included in the branch `dependencies`, and there's an example of the file structures in the branch `ep08-shaders`.
+
+Aside from the library files, it needs extra configuration in `tasks.json` in VS Code:
+
+    ```json
+    ...
+    "args": [
+      "-std=c++17",
+      "-fdiagnostics-color=always",
+      "-Wall",
+      "-g",
+      "-I${workspaceFolder}/dependencies/include",
+      "-L${workspaceFolder}/dependencies/library",
+      "${workspaceFolder}/dependencies/library/libglfw.3.3.dylib",
+      "${workspaceFolder}/src/*.cpp",
+      "${workspaceFolder}/src/glad.c",
+      "-o",
+      "${workspaceFolder}/app",
+      "-framework",
+      "OpenGL",
+      "-framework",
+      "Cocoa",
+      "-framework",
+      "IOKit",
+      "-framework",
+      "CoreVideo",
+      "-framework",
+      "CoreFoundation",
+      "-Wno-deprecated"
+    ],
+    ...
+    ```
+
+### Contents
+
+This repository follows the [OpenGL Tutorial by The Cherno](https://www.youtube.com/watch?v=W3gAzLwfIP0&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2). To clarify, the original demo is based on GLEW and runs on Windows. Here, it's using GLAD instead and running on MacOS.
