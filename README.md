@@ -44,7 +44,7 @@ Aside from the library files, it needs extra configuration in `tasks.json` in VS
       "${workspaceFolder}/src/*.cpp",
       "${workspaceFolder}/src/glad.c",
       "-o",
-      "${workspaceFolder}/app",
+      "${workspaceFolder}/src/app",
       "-framework",
       "OpenGL",
       "-framework",
