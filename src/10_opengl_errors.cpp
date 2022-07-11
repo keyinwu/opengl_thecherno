@@ -6,6 +6,8 @@
 #include <sstream>
 #include <string>
 
+using namespace std;
+
 /* MSVC
 #define ASSERT(x) if (!(x)) __debugbreak();
 #define GLCALL(x) GLClearError();\
@@ -13,11 +15,15 @@
     ASSERT(GLLogCall(#x, __FILE__, __LINE__))
 */
 
-using namespace std;
+#define ASSERT(x) if (!(x)) assert(false)
+#define GLCALL(x) GLClearError();\
+    x;\
+    ASSERT(GLCheckErro())
 
 static void GLClearError();
-static void GLCheckErro();
-static bool GLLogCall(const char* function, const char* file, int line);
+static bool GLCheckErro();
+// static bool GLLogCall(const char* function, const char* file, int line);
+
 
 struct ShaderProgramSource {
     string VertexSource;
@@ -129,10 +135,9 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        GLClearError();         /* -------- Debug -------- */
-        // glDrawArrays(GL_TRIANGLES, 0, 6); 
-        glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr); // GL_UNSIGNED_INT
-        GLCheckErro();   
+        // GLClearError();         /* -------- Debug -------- */
+        GLCALL(glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr)); // UNSIGNED
+        // GLCheckErro();   
         // ASSERT(GLLogCall());    /* -------- Debug -------- */
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -238,7 +243,7 @@ static unsigned int CreateShader(const string& vertexShader, const string& fragm
 
 
 // process whether relevant keys are pressed/released
-// -------------------------------------------------------------
+// --------------------------------------------------
 void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -246,26 +251,51 @@ void processInput(GLFWwindow *window)
 }
 
 // executes whenever the window size changed
-// ---------------------------------------------------------------------------------------------
+// -----------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
 
+// opengl error handling
+// ---------------------
 static void GLClearError()
 {
     while (glGetError() != GL_NO_ERROR);
 }
 
-static void GLCheckErro() 
+static bool GLCheckErro() 
 {
     while (GLenum error = glGetError())
     {
-        cout << "[OpenGL Error] (" << error << ")" << endl;
+        cout << "[OpenGL Error] (" << error << "): ";
+        switch(error) 
+        {
+            case GL_INVALID_ENUM :
+                std::cout << "GL_INVALID_ENUM";
+                break;
+            case GL_INVALID_VALUE :
+                std::cout << "GL_INVALID_VALUE";
+                break;
+            case GL_INVALID_OPERATION :
+                std::cout << "GL_INVALID_OPERATION";
+                break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION :
+                std::cout << "GL_INVALID_FRAMEBUFFER_OPERATION";
+                break;
+            case GL_OUT_OF_MEMORY :
+                std::cout << "GL_OUT_OF_MEMORY";
+                break;
+            default :
+                std::cout << "Unrecognized error" << error;
+        }
+        cout << endl;
+        return false;
     }
-    
+    return true;
 }
 
+/*
 static bool GLLogCall(const char* function, const char* file, int line)
 {
     while (GLenum error = glGetError())
@@ -276,3 +306,4 @@ static bool GLLogCall(const char* function, const char* file, int line)
     }
     return true;
 }
+*/
