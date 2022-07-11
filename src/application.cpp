@@ -67,7 +67,7 @@ int main()
 
     // cout << "Using GL Version: " << glGetString(GL_VERSION) << endl;     // check OpenGL Version
 
-    glClearColor(0.0f, 0.4f, 0.2f, 0.0f);   // background color
+    glClearColor(0.2f, 0.4f, 0.2f, 0.0f);   // background color
 
     // vertex buffers
     // --------------
@@ -77,11 +77,16 @@ int main()
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-    float positions[6] = 
-    {
+    float positions[] = {
         -0.5f, -0.5f,
-         0.0f,  0.5f,
-         0.5f, -0.5f
+         0.5f, -0.5f,
+         0.5f,  0.5f,
+        -0.5f,  0.5f
+    };
+
+    unsigned int indices[] = {
+        0, 1, 2,
+        2, 3, 0
     };
 
     // buffer id
@@ -89,7 +94,7 @@ int main()
 
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0); 
         // it calls for each attribute -- position here
@@ -98,6 +103,13 @@ int main()
         // stride: vertex size -- 8 bytes / sizeof(float) * 2
         // 0 offset here, a pointer -- "integer is pointer", (const void*)
     glEnableVertexAttribArray(0);
+
+    // index buffer object
+    unsigned int ibo;
+
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
 
     // vertex & fragment shaders
@@ -115,8 +127,9 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);   // draw after bind/(select)
-        // or glDrawElements(GL_TRIANGLES, 3, ...indexbuffer);
+        // glDrawArrays(GL_TRIANGLES, 0, 6); 
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+            // 6 for 6 indices
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
