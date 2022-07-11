@@ -6,7 +6,18 @@
 #include <sstream>
 #include <string>
 
+/* MSVC
+#define ASSERT(x) if (!(x)) __debugbreak();
+#define GLCALL(x) GLClearError();\
+    x;\
+    ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+*/
+
 using namespace std;
+
+static void GLClearError();
+static void GLCheckErro();
+static bool GLLogCall(const char* function, const char* file, int line);
 
 struct ShaderProgramSource {
     string VertexSource;
@@ -65,8 +76,6 @@ int main()
         return -1;
     }
 
-    // cout << "Using GL Version: " << glGetString(GL_VERSION) << endl;     // check OpenGL Version
-
     glClearColor(0.2f, 0.4f, 0.2f, 0.0f);   // background color
 
     // vertex buffers
@@ -96,11 +105,6 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0); 
-        // it calls for each attribute -- position here
-        // 0 for attribute index
-        // 2 floats for each vertex
-        // stride: vertex size -- 8 bytes / sizeof(float) * 2
-        // 0 offset here, a pointer -- "integer is pointer", (const void*)
     glEnableVertexAttribArray(0);
 
     // index buffer object
@@ -125,9 +129,11 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT);
 
+        GLClearError();         /* -------- Debug -------- */
         // glDrawArrays(GL_TRIANGLES, 0, 6); 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-            // 6 for 6 indices
+        glDrawElements(GL_TRIANGLES, 6, GL_INT, nullptr); // GL_UNSIGNED_INT
+        GLCheckErro();   
+        // ASSERT(GLLogCall());    /* -------- Debug -------- */
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
@@ -244,4 +250,29 @@ void processInput(GLFWwindow *window)
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+static void GLClearError()
+{
+    while (glGetError() != GL_NO_ERROR);
+}
+
+static void GLCheckErro() 
+{
+    while (GLenum error = glGetError())
+    {
+        cout << "[OpenGL Error] (" << error << ")" << endl;
+    }
+    
+}
+
+static bool GLLogCall(const char* function, const char* file, int line)
+{
+    while (GLenum error = glGetError())
+    {
+        cout << "[OpenGL Error] (" << error << "): " << function <<
+            " " << file << ": " << line << endl;
+        return false;
+    }
+    return true;
 }
