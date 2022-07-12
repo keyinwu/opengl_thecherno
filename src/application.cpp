@@ -52,7 +52,7 @@ int main()
 	}
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // GLFW_OPENGL_COMPAT_PROFILE has default VAO
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -88,12 +88,6 @@ int main()
 
     // vertex buffers
     // --------------
-
-    // necessary to add, and the order matters!
-    unsigned int VertexArrayID;
-	GLCALL(glGenVertexArrays(1, &VertexArrayID));
-	GLCALL(glBindVertexArray(VertexArrayID));
-
     float positions[] = {
         -0.5f, -0.5f,
          0.5f, -0.5f,
@@ -106,13 +100,18 @@ int main()
         2, 3, 0
     };
 
+    // vertex array object
+    unsigned int vao;
+	GLCALL(glGenVertexArrays(1, &vao));
+	GLCALL(glBindVertexArray(vao));
+
     // buffer id
     unsigned int buffer;
     GLCALL(glGenBuffers(1, &buffer));
     GLCALL(glBindBuffer(GL_ARRAY_BUFFER, buffer));
     GLCALL(glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW));
 
-    GLCALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0)); 
+    GLCALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0)); // link buffer and vao[0]
     GLCALL(glEnableVertexAttribArray(0));
 
     // index buffer object
@@ -132,7 +131,12 @@ int main()
     GLCALL(int location = glGetUniformLocation(shader, "u_Color"));
     ASSERT(location != -1);
     GLCALL(glUniform4f(location, 0.8f, 0.2f, 0.3f, 1.0f));
-        // 4f -- 4 floats in vec4
+
+    // unbind
+    GLCALL(glBindVertexArray(0));
+    GLCALL(glUseProgram(0));
+    GLCALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
 
     float r = 0.0f;
     float increment = 0.05f;
@@ -146,7 +150,16 @@ int main()
 
         GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 
+        // rebind
+        GLCALL(glUseProgram(shader));
         GLCALL(glUniform4f(location, r, 0.2f, 0.3f, 1.0f));
+        // only need to bind vertex array in this case
+        // GLCALL(glBindBuffer(GL_ARRAY_BUFFER, buffer));
+        // GLCALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0)); 
+        // GLCALL(glEnableVertexAttribArray(0));
+        GLCALL(glBindVertexArray(vao));
+        GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
+
         GLCALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
         if (r > 1.0f)
@@ -165,7 +178,7 @@ int main()
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     GLCALL(glDeleteBuffers(1, &buffer));
-	GLCALL(glDeleteVertexArrays(1, &VertexArrayID));
+	GLCALL(glDeleteVertexArrays(1, &vao));
 
     GLCALL(glDeleteProgram(shader));
 
