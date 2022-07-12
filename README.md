@@ -2,6 +2,8 @@
 
 This repository is based on GLFW and GLAD running on MacOS. 
 
+Check the branches to see the progress of the episodes.
+
 ### GLFW and GLAD Setup
 
 Install GLFW by the command `brew install glfw`.
@@ -27,7 +29,7 @@ Put library files into the workspace directory:
 ```
 * The library version needs to be consistent with the downloaded.
 
-The library files are included in the branch `dependencies`, and there's an example of the file structures in the branch `ep08-shaders`.
+The library files are included in the branch `dependencies`, and there're examples of the file structure in the branches.
 
 Aside from the library files, it needs extra configuration in `tasks.json` in VS Code:
 
