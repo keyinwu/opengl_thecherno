@@ -9,6 +9,7 @@
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
 
 
 using namespace std;
@@ -77,7 +78,7 @@ int main()
 
     // vertex buffers
     // --------------
-    // { 
+    // {    /* Scope */
         float positions[] = {
             -0.5f, -0.5f,
             0.5f, -0.5f,
@@ -90,15 +91,12 @@ int main()
             2, 3, 0
         };
 
-        // vertex array object
-        unsigned int vao;
-        GLCALL(glGenVertexArrays(1, &vao));
-        GLCALL(glBindVertexArray(vao));
-
+        VertexArray va;
         VertexBuffer vb(positions, 4 * 2 * sizeof(float));
+        VertexBufferLayout layout;
 
-        GLCALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0)); // link buffer and vao[0]
-        GLCALL(glEnableVertexAttribArray(0));
+        layout.Push<float>(2);
+        va.AddBuffer(vb, layout);
 
         IndexBuffer ib(indices, 6);
 
@@ -115,7 +113,7 @@ int main()
         GLCALL(glUniform4f(location, 0.8f, 0.2f, 0.3f, 1.0f));
 
         // unbind
-        GLCALL(glBindVertexArray(0));
+        va.Unbind();
         GLCALL(glUseProgram(0));
         GLCALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
         GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
@@ -136,7 +134,7 @@ int main()
             GLCALL(glUseProgram(shader));
             GLCALL(glUniform4f(location, r, 0.2f, 0.3f, 1.0f));
 
-            GLCALL(glBindVertexArray(vao));
+            va.Bind();
             ib.Bind();
 
             GLCALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
@@ -156,10 +154,8 @@ int main()
 
         // glfw: terminate, clearing all previously allocated GLFW resources.
         // ------------------------------------------------------------------
-        GLCALL(glDeleteVertexArrays(1, &vao));
-
         GLCALL(glDeleteProgram(shader));
-    // }
+    // }    /* Scope */
 
     glfwTerminate();
     return 0;
