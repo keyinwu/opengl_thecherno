@@ -12,6 +12,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
+#include "Texture.h"
 
 
 using namespace std;
@@ -70,10 +71,10 @@ int main()
     // --------------
     // {    /* Scope */
         float positions[] = {
-            -0.5f, -0.5f,
-            0.5f, -0.5f,
-            0.5f,  0.5f,
-            -0.5f,  0.5f
+            -0.5f, -0.5f, 0.0f, 0.0f,   // vertex0, texcoord
+             0.5f, -0.5f, 1.0f, 0.0f,
+             0.5f,  0.5f, 1.0f, 1.0f,
+            -0.5f,  0.5f, 0.0f, 1.0f
         };
 
         unsigned int indices[] = {
@@ -81,10 +82,14 @@ int main()
             2, 3, 0
         };
 
-        VertexArray va;
-        VertexBuffer vb(positions, 4 * 2 * sizeof(float));
-        VertexBufferLayout layout;
+        // transparency
+        GLCALL(glEnable(GL_BLEND));
+        GLCALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
+        VertexArray va;
+        VertexBuffer vb(positions, 4 * 4 * sizeof(float));
+        VertexBufferLayout layout;
+        layout.Push<float>(2);
         layout.Push<float>(2);
         va.AddBuffer(vb, layout);
 
@@ -93,9 +98,11 @@ int main()
 
         // vertex & fragment shaders
         // -------------------------
-        Shader shader("res/shaders/uniforms.shader");
+        Shader shader("res/shaders/textures.shader");
         shader.Bind();
-        shader.SetUniform4f("u_Color", 0.8f, 0.2f, 0.3f, 1.0f);
+        Texture texture("res/textures/haikyu.png");
+        texture.Bind();                         // slot 0 by default
+        shader.SetUniform1i("u_Texture", 0);    // slot 0
 
         // unbind
         va.Unbind();
@@ -117,10 +124,7 @@ int main()
 
             renderer.Clear();
 
-            // rebind
-            shader.Bind();
-            shader.SetUniform4f("u_Color", r, 0.2f, 0.3f, 1.0f);
-
+            // rebind everything
             renderer.Draw(va, ib, shader);
 
             if (r > 1.0f)
@@ -129,7 +133,6 @@ int main()
                 increment = 0.05f;
             
             r += increment;
-            
             
             // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
             glfwSwapBuffers(window);
