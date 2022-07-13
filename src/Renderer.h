@@ -11,6 +11,10 @@
 
 using namespace std;
 
+#define GLCALL(x) GLClearError();\
+    x;\
+    ASSERT(GLCheckErro())
+
 class Renderer
 {
 public:
