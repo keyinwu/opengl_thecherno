@@ -1,5 +1,25 @@
 #include "Renderer.h"
 
+
+void Renderer::Clear() const
+{
+    GLCALL(glClear(GL_COLOR_BUFFER_BIT));
+}
+
+void Renderer::BgColor(float v0, float v1, float v2, float v3)
+{
+    GLCALL(glClearColor(v0, v1, v2, v3));
+}
+
+void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
+{
+    shader.Bind();
+    va.Bind();
+    ib.Bind();
+    GLCALL(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr)); // default to be unsigned int
+}
+
+
 // opengl error handling
 // ---------------------
 void GLClearError()

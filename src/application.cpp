@@ -8,6 +8,7 @@
 
 #include "Renderer.h"
 #include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
@@ -19,7 +20,7 @@ using namespace std;
 const unsigned int SCR_WIDTH = 1024;
 const unsigned int SCR_HEIGHT = 768;
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+// void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
 int main() 
@@ -51,7 +52,7 @@ int main()
         return -1;
     }
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    // glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     glfwSwapInterval(1);
 
@@ -64,9 +65,6 @@ int main()
         glfwTerminate();
         return -1;
     }
-
-    GLCALL(glClearColor(0.2f, 0.4f, 0.2f, 0.0f));   // background color
-
 
     // vertex buffers
     // --------------
@@ -108,6 +106,8 @@ int main()
         float r = 0.0f;
         float increment = 0.05f;
 
+        Renderer renderer;
+        renderer.BgColor(0.2f, 0.4f, 0.2f, 0.0f);
 
         // render loop
         // -----------
@@ -115,16 +115,13 @@ int main()
         {
             processInput(window);
 
-            GLCALL(glClear(GL_COLOR_BUFFER_BIT));
+            renderer.Clear();
 
             // rebind
             shader.Bind();
             shader.SetUniform4f("u_Color", r, 0.2f, 0.3f, 1.0f);
 
-            va.Bind();
-            ib.Bind();
-
-            GLCALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+            renderer.Draw(va, ib, shader);
 
             if (r > 1.0f)
                 increment = -0.05f;
@@ -141,7 +138,6 @@ int main()
 
         // glfw: terminate, clearing all previously allocated GLFW resources.
         // ------------------------------------------------------------------
-        // GLCALL(glDeleteProgram(shader));
     // }    /* Scope */
 
     glfwTerminate();
@@ -159,7 +155,7 @@ void processInput(GLFWwindow *window)
 
 // executes whenever the window size changed
 // -----------------------------------------
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    GLCALL(glViewport(0, 0, width, height));
-}
+// void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+// {
+//     GLCALL(glViewport(0, 0, width, height));
+// }
