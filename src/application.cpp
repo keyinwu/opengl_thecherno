@@ -73,10 +73,10 @@ int main()
     // --------------
     // {    /* Scope */
         float positions[] = {
-            -0.5f, -0.5f, 0.0f, 0.0f,   // vertex0, texcoord
-             0.5f, -0.5f, 1.0f, 0.0f,
-             0.5f,  0.5f, 1.0f, 1.0f,
-            -0.5f,  0.5f, 0.0f, 1.0f
+            100.0f, 100.0f, 0.0f, 0.0f,   // vertex0, texcoord
+            200.0f, 100.0f, 1.0f, 0.0f,
+            200.0f, 200.0f, 1.0f, 1.0f,
+            100.0f, 200.0f, 0.0f, 1.0f
         };
 
         unsigned int indices[] = {
@@ -97,8 +97,12 @@ int main()
 
         IndexBuffer ib(indices, 6);
 
-        glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);  // 4 : 3
-        // glm::mat4 proj = glm::ortho(0.0f, 1024.0f, 0.0f, 768.0f, -1.0f, 1.0f);
+        // glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);  // 4 : 3
+        glm::mat4 proj = glm::ortho(0.0f, 1024.0f, 0.0f, 768.0f, -1.0f, 1.0f);
+        glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100, 0, 0));
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200, 200, 0));
+
+        glm::mat4 mvp = proj * view * model;
 
         // vertex & fragment shaders
         // -------------------------
@@ -107,7 +111,7 @@ int main()
         Texture texture("res/textures/haikyu.png");
         texture.Bind();                         // slot 0 by default
         shader.SetUniform1i("u_Texture", 0);    // slot 0
-        shader.SetUniformMat4f("u_MVP", proj);  // model view projection matrix
+        shader.SetUniformMat4f("u_MVP", mvp);  // model view projection matrix
 
         // unbind
         va.Unbind();
