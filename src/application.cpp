@@ -14,6 +14,8 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 using namespace std;
 
@@ -95,14 +97,17 @@ int main()
 
         IndexBuffer ib(indices, 6);
 
+        glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);  // 4 : 3
+        // glm::mat4 proj = glm::ortho(0.0f, 1024.0f, 0.0f, 768.0f, -1.0f, 1.0f);
 
         // vertex & fragment shaders
         // -------------------------
-        Shader shader("res/shaders/textures.shader");
+        Shader shader("res/shaders/matrix.shader");
         shader.Bind();
         Texture texture("res/textures/haikyu.png");
         texture.Bind();                         // slot 0 by default
         shader.SetUniform1i("u_Texture", 0);    // slot 0
+        shader.SetUniformMat4f("u_MVP", proj);  // model view projection matrix
 
         // unbind
         va.Unbind();
