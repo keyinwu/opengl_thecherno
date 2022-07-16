@@ -1,4 +1,4 @@
-# ep22-imgui
+# ep23-multi-obj
 
 The compiler will also need glm library under `dependencies/include`, as shown in the `dependencies-main`.
 
