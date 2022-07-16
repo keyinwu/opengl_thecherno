@@ -17,6 +17,9 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw_gl3.h"
+
 using namespace std;
 
 // window settings
@@ -58,7 +61,7 @@ int main()
     // glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     glfwSwapInterval(1);
-
+     
 
     // glad: load all OpenGL function pointers
     // ---------------------------------------
@@ -100,9 +103,9 @@ int main()
         // glm::mat4 proj = glm::ortho(-2.0f, 2.0f, -1.5f, 1.5f, -1.0f, 1.0f);  // 4 : 3
         glm::mat4 proj = glm::ortho(0.0f, 1024.0f, 0.0f, 768.0f, -1.0f, 1.0f);
         glm::mat4 view = glm::translate(glm::mat4(1.0f), glm::vec3(-100, 0, 0));
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200, 200, 0));
+        // glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(200, 200, 0));
 
-        glm::mat4 mvp = proj * view * model;
+        // glm::mat4 mvp = proj * view * model;
 
         // vertex & fragment shaders
         // -------------------------
@@ -111,7 +114,6 @@ int main()
         Texture texture("res/textures/haikyu.png");
         texture.Bind();                         // slot 0 by default
         shader.SetUniform1i("u_Texture", 0);    // slot 0
-        shader.SetUniformMat4f("u_MVP", mvp);  // model view projection matrix
 
         // unbind
         va.Unbind();
@@ -119,11 +121,18 @@ int main()
         ib.Unbind();
         shader.Unbind();
 
-        float r = 0.0f;
-        float increment = 0.05f;
-
         Renderer renderer;
         renderer.BgColor(0.2f, 0.4f, 0.2f, 0.0f);
+
+        //GUI
+        ImGui::CreateContext();
+        ImGui_ImplGlfwGL3_Init(window, true);
+        ImGui::StyleColorsDark();
+
+        glm::vec3 translation(200, 200, 0);
+
+        float r = 0.0f;
+        float increment = 0.05f;
 
         // render loop
         // -----------
@@ -132,6 +141,13 @@ int main()
             processInput(window);
 
             renderer.Clear();
+
+            ImGui_ImplGlfwGL3_NewFrame();
+
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), translation);
+            glm::mat4 mvp = proj * view * model;
+            shader.Bind();
+            shader.SetUniformMat4f("u_MVP", mvp);
 
             // rebind everything
             renderer.Draw(va, ib, shader);
@@ -142,6 +158,15 @@ int main()
                 increment = 0.05f;
             
             r += increment;
+
+            {
+                ImGui::SliderFloat3("Translation", &translation.x, 0.0f, 1024.0f);            // Edit 3 float  
+                ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            }
+
+            ImGui::Render();
+            ImGui_ImplGlfwGL3_RenderDrawData(ImGui::GetDrawData());
+        
             
             // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
             glfwSwapBuffers(window);
@@ -151,6 +176,8 @@ int main()
         // glfw: terminate, clearing all previously allocated GLFW resources.
         // ------------------------------------------------------------------
     // }    /* Scope */
+    ImGui_ImplGlfwGL3_Shutdown();
+    ImGui::DestroyContext();
 
     glfwTerminate();
     return 0;
