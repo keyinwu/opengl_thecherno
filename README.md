@@ -20,47 +20,58 @@ Put library files into the workspace directory:
        |__ GLFW
          |__ glfw3.h
          |__ glfw3native.h
+       |__ glm
        |__ KHR
          |__ khrplatform.h
+       |__ stb_image
+         |__ stb_image.h
      |__ library
        |__ libglfw.3.3.dylib
    |__ src
-     |__ glad.c
+     |__ vendor
+       |__ imgui
+       |__ glad.c
+       |__ stb_image.cpp
 ```
 * The library version needs to be consistent with the downloaded.
 
-The library files are included in the branch `dependencies`, and there're examples of the file structure in the branches.
+Library files the `main` branch used are included in the branch `dependencies-main`.
 
 Aside from the library files, it needs extra configuration in `tasks.json` in VS Code:
 
-    ```json
-    ...
-    "args": [
-      "-std=c++17",
-      "-fdiagnostics-color=always",
-      "-Wall",
-      "-g",
-      "-I${workspaceFolder}/dependencies/include",
-      "-L${workspaceFolder}/dependencies/library",
-      "${workspaceFolder}/dependencies/library/libglfw.3.3.dylib",
-      "${workspaceFolder}/src/*.cpp",
-      "${workspaceFolder}/src/glad.c",
-      "-o",
-      "${workspaceFolder}/src/app",
-      "-framework",
-      "OpenGL",
-      "-framework",
-      "Cocoa",
-      "-framework",
-      "IOKit",
-      "-framework",
-      "CoreVideo",
-      "-framework",
-      "CoreFoundation",
-      "-Wno-deprecated"
-    ],
-    ...
-    ```
+ ```json
+ // Final Version
+ "args": [
+   "-std=c++17",
+   "-fdiagnostics-color=always",
+   "-Wall",
+   "-g",
+   "-I${workspaceFolder}/dependencies/include",
+   "-I${workspaceFolder}/src/vendor",
+   "-I${workspaceFolder}/src",
+   "-L${workspaceFolder}/dependencies/library",
+   "${workspaceFolder}/dependencies/library/libglfw.3.3.dylib",
+   "${workspaceFolder}/src/*.cpp",
+   "${workspaceFolder}/src/vendor/*.c",
+   "${workspaceFolder}/src/vendor/*.cpp",
+   "${workspaceFolder}/src/tests/*.cpp",
+   "${workspaceFolder}/src/vendor/imgui/*.cpp",
+   "-o",
+   "${workspaceFolder}/src/app",
+   "-framework",
+   "OpenGL",
+   "-framework",
+   "Cocoa",
+   "-framework",
+   "IOKit",
+   "-framework",
+   "CoreVideo",
+   "-framework",
+   "CoreFoundation",
+   "-Wno-deprecated",
+   "-Wno-int-to-void-pointer-cast"
+ ],
+ ```
 
 ### Contents
 
