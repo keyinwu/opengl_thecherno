@@ -1,4 +1,4 @@
-# ep23-multi-obj
+# ep24-26-opengl-tests
 
 The compiler will also need glm library under `dependencies/include`, as shown in the `dependencies-main`.
 
@@ -12,11 +12,13 @@ VS Code `tasks.json`:
     "-g",
     "-I${workspaceFolder}/dependencies/include",
     "-I${workspaceFolder}/src/vendor",
+    "-I${workspaceFolder}/src",
     "-L${workspaceFolder}/dependencies/library",
     "${workspaceFolder}/dependencies/library/libglfw.3.3.dylib",
     "${workspaceFolder}/src/*.cpp",
     "${workspaceFolder}/src/vendor/*.c",
     "${workspaceFolder}/src/vendor/*.cpp",
+    "${workspaceFolder}/src/tests/*.cpp",
     "${workspaceFolder}/src/vendor/imgui/*.cpp",
     "-o",
     "${workspaceFolder}/src/app",
