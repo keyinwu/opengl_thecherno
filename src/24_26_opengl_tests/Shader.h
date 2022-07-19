@@ -22,7 +22,7 @@ class Shader
 private:
     string m_FilePath;
     unsigned int m_RendererID;
-    unordered_map<string, int> m_UniformLocationCache;
+    mutable unordered_map<string, int> m_UniformLocationCache;
 public:
     Shader(const string& filepath);
     ~Shader();
@@ -33,14 +33,17 @@ public:
     // Set uniforms
     void SetUniform1i(const string& name, int value);
     void SetUniform1f(const string& name, float value);
-    void SetUniform4f(const string& name, float v0, float v1, float v2, float v3);
+    void SetUniform2f(const string& name, const glm::vec2& value);
+    void SetUniform3f(const string& name, const glm::vec3& value);
+    void SetUniform4f(const string& name, const glm::vec4& value);
+    void SetUniformMat3f(const string& name, const glm::mat3& matrix);
     void SetUniformMat4f(const string& name, const glm::mat4& matrix);
 private:
     ShaderProgramSource ParseShader(const string& filepath);
     unsigned int CompileShader(unsigned int type, const string& source);
     unsigned int CreateShader(const string& vertexShader, const string& fragmentShader);
 
-    int GetUniformLocation(const string& name);
+    int GetUniformLocation(const string& name) const;
 };
 
 #endif
